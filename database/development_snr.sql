@@ -85,5 +85,5 @@ alter table auth.users add constraint fk_department_id foreign key (department_i
 INSERT INTO genders (id,gender) VALUES (1,'Mujer'), (2,'Hombre'), (3,'Otro');
 INSERT INTO auth.roles (id,role) VALUES (1,'Administradora'),(2,'Operadora');
 INSERT INTO auth.department (id,department) VALUES (1,'0800'),(2,'Informática');
-INSERT INTO persons (identity_card, is_foreign, first_name, first_last_name, gender_id) VALUES (28076011, false, 'Nicolas','Zapata', 2);
+INSERT INTO persons (id,identity_card, is_foreign, first_name, first_last_name, gender_id) VALUES (1,28076011, false, 'Nicolas','Zapata', 2);
 INSERT INTO auth.users (username,password,is_active,person_id,rol_id,department_id) VALUES ('nicoadmin','12345678',true,1,1,2);
