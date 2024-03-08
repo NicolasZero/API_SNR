@@ -2,25 +2,29 @@ const { Pool } = require('pg')
 const { compare, encrypt } = require('../helpers/helper.encrypt.js')
 
 const pool = new Pool({
-    host: 'localhost',
-    user: 'postgres',
-    password: '28076011',
-    database: 'development_snr',
-    port: '5432'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 })
 
 const getUsers = async (req, res) => {
     try {
         const response = await pool.query('SELECT * FROM auth.users')
-        res.json({ data: response.rows[0] })
+        res.json({ data: response.rows})
     } catch (error) {
         res.json(error)
     }
 }
 
 const getPersons = async (req, res) => {
-    const response = await pool.query('SELECT * FROM persons')
-    res.json(response.rows)
+    try {
+        const response = await pool.query('SELECT * FROM persons')
+        res.json({data: response.rows})
+    }catch (error) {
+        res.json(error)
+    }
 }
 
 const pruebas = async (req, res) => {
