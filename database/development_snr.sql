@@ -86,4 +86,5 @@ INSERT INTO genders (id,gender) VALUES (1,'Mujer'), (2,'Hombre'), (3,'Otro');
 INSERT INTO auth.roles (id,role) VALUES (1,'Administradora'),(2,'Operadora');
 INSERT INTO auth.department (id,department) VALUES (1,'0800'),(2,'Informática');
 INSERT INTO persons (id,identity_card,first_name,first_last_name,gender_id) VALUES (1,28076011,'Nicolas','Zapata',2);
-INSERT INTO auth.users (id,username,password,person_id,rol_id,department_id) VALUES (1,'nicoadmin','12345678',1,1,2);
+INSERT INTO auth.users (id,username,password,person_id,rol_id,department_id) VALUES (1,'nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze',1,1,2);
+-- password = 123456

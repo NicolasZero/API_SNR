@@ -4,7 +4,7 @@ const {createItem,deleteItem,getItem,getItems,updateItem} = require('../controll
 
 router.get('/',getItems)
 
-router.get('/:id',getItem)
+router.get('/:id',getItem)//id
 
 router.post('/',createItem)
 
