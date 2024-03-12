@@ -1,4 +1,4 @@
--- Ultimpo cambio el 11/03/2024
+-- Ultimpo cambio el 12/03/2024
 -- Crea las tablas
 CREATE TABLE persons(
     id serial primary key,
@@ -79,17 +79,17 @@ CREATE TABLE auth.departments(
 );
 
 ALTER TABLE auth.users ADD CONSTRAINT fk_person_id FOREIGN KEY (person_id) references persons(id);
-ALTER TABLE auth.users ADD CONSTRAINT fk_rol_id FOREIGN KEY (rol_id) references auth.roles(id);
+ALTER TABLE auth.users ADD CONSTRAINT fk_rol_id FOREIGN KEY (role_id) references auth.roles(id);
 ALTER TABLE auth.users ADD CONSTRAINT fk_department_id FOREIGN KEY (department_id) references auth.departments(id);
 
 CREATE VIEW view_user_data AS SELECT u.id, u.username, u.password, r.role, d.department, u.is_active  FROM auth.users AS u
 INNER JOIN auth.roles AS r ON r.id = u.role_id
-INNER JOIN auth.departments AS d ON d.id = u.department_id
+INNER JOIN auth.departments AS d ON d.id = u.department_id;
 
 -- Inserta datos de pruebas
 INSERT INTO genders (id,gender) VALUES (1,'Mujer'), (2,'Hombre'), (3,'Otro');
 INSERT INTO auth.roles (id,role) VALUES (1,'Administradora'),(2,'Operadora');
 INSERT INTO auth.departments (id,department) VALUES (1,'0800'),(2,'Informática');
 INSERT INTO persons (id,identity_card,first_name,first_last_name,gender_id) VALUES (1,28076011,'Nicolas','Zapata',2);
-INSERT INTO auth.users (id,username,password,person_id,rol_id,department_id) VALUES (1,'nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze',1,1,2);
+INSERT INTO auth.users (id,username,password,person_id,role_id,department_id) VALUES (1,'nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze',1,1,2);
 -- password = 123456
