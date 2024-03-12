@@ -1,4 +1,4 @@
-const {httpError} = require('../helpers/helperError')
+const httpError = require('../helpers/helperError')
 const pool = require('../../config/postgresql')
 
 

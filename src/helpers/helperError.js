@@ -4,4 +4,4 @@ const httpError = (res, err) =>{
     res.send({error:'something went wrong'})
 }
 
-module.exports = {httpError}
+module.exports = httpError
