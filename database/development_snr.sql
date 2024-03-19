@@ -86,10 +86,17 @@ CREATE VIEW view_user_data AS SELECT u.id, u.username, u.password, r.role, d.dep
 INNER JOIN auth.roles AS r ON r.id = u.role_id
 INNER JOIN auth.departments AS d ON d.id = u.department_id;
 
+CREATE VIEW view_user_profile AS SELECT u.id, u.username, u.is_active, p.identity_card, p.is_foreign, p.first_name, p.other_names, p.first_last_name, p.other_last_names, p.email, p.phone, g.gender, r.role, d.department
+FROM auth.users AS u
+INNER JOIN persons AS p ON p.id = u.person_id
+INNER JOIN genders AS g ON g.id = p.gender_id
+INNER JOIN auth.roles AS r ON r.id = u.role_id
+INNER JOIN auth.departments AS d ON d.id = u.department_id
+
 -- Inserta datos de pruebas
 INSERT INTO genders (id,gender) VALUES (1,'Mujer'), (2,'Hombre'), (3,'Otro');
-INSERT INTO auth.roles (id,role) VALUES (1,'Administradora'),(2,'Operadora');
-INSERT INTO auth.departments (id,department) VALUES (1,'0800'),(2,'Informática');
+INSERT INTO auth.roles (id,role) VALUES (1,'Administradora'),(2,'Directora'),(3,'Analista'),(4,'Usuaria');
+INSERT INTO auth.departments (id,department) VALUES (1,'0800'),(2,'OSTI'),(3,'OAC'),(4,'SIN');
 INSERT INTO persons (id,identity_card,first_name,first_last_name,gender_id) VALUES (1,28076011,'Nicolas','Zapata',2);
 INSERT INTO auth.users (id,username,password,person_id,role_id,department_id) VALUES (1,'nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze',1,1,2);
 -- password = 123456

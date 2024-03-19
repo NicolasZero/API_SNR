@@ -6,7 +6,7 @@ const {createItem,deleteItem,getItem,getItems,updateItem} = require('../controll
 
 router.get('/',checkAuth, checkRoleAuth([1,2]),getItems)
 
-router.get('/:id',getItem)//id
+router.get('/:id', checkAuth, checkRoleAuth([1,2]),getItem)//id
 
 router.post('/',checkAuth, checkRoleAuth([1,2]),createItem)
 

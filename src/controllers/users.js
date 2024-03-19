@@ -4,7 +4,7 @@ const pool = require('../../config/postgresql')
 
 const getItems = async (req,res) => {
     try {
-        const response = await pool.query('SELECT * FROM auth.users')
+        const response = await pool.query('SELECT * FROM view_user_profile')
         res.json({ data: response.rows})
     } catch (error) {
         httpError(res,error)
@@ -14,7 +14,7 @@ const getItems = async (req,res) => {
 const getItem = async (req,res) => {
     try {
         const id = req.params.id
-        const response = await pool.query('SELECT * FROM auth.users WHERE id=$1',[id])
+        const response = await pool.query('SELECT * FROM view_user_profile WHERE id=$1',[id])
         res.json({ data: response.rows})
     } catch (error) {
         httpError(res,error)
