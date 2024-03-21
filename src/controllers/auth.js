@@ -18,10 +18,10 @@ const authUser = async (req, res) => {
           tokenSession,
         });
       } else {
-        res.json({ error: { msg: "Usuario o contraseña no coinciden" } });
+        res.status(409).json({ error: { msg: "Usuario o contraseña no coinciden" } });
       }
     } else {
-      res.json({ error: { msg: "Usuario o contraseña no coinciden" } });
+      res.status(409).json({ error: { msg: "Usuario o contraseña no coinciden" } });
     }
   } catch (error) {
     httpError(res, error);
