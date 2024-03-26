@@ -12,7 +12,7 @@ router.get('/ic/:value',checkAuth, checkRoleAuth([1,2]),getItem('identity_card')
 
 router.put('/',checkAuth, checkRoleAuth([1,2]),createItem)
 
-router.patch('/:id',updateItem)
+router.patch('/:id',checkAuth, checkRoleAuth([1,2]),updateItem)
 
 router.delete('/:id',checkAuth, checkRoleAuth([1,2]),deleteItem)
 

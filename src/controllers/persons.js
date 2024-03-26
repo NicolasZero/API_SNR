@@ -13,21 +13,21 @@ const getItems = async (req, res) => {
 
 const getItem = (column) => async (req, res) => {
   try {
-    const value = [req.params.value];
+    const value = [req.params.value]
     if (onlyNumbers(req.params.value)) {
       const text = `SELECT * FROM persons WHERE ${column}=$1`;
-      const response = await query(text, value);
-      res.json({ data: response.rows });
+      const response = await query(text, value)
+      res.json({ data: response.rows })
     } else {
       res.status(400).json({
         status: "FAILED",
         data: {
           error: `'${value}': No es un valor válido! Debe de ser solo números y no un string`,
         },
-      });
+      })
     }
   } catch (error) {
-    httpError(res, error);
+    httpError(res, error)
   }
 };
 
@@ -49,31 +49,45 @@ const createItem = async (req, res) => {
     const resp = await query(textQuery,varQuery);
     res.json({ status:"OK", data: resp.rows });
   } catch (error) {
-    httpError(res, error);
+    httpError(res, error)
   }
 };
 
 const updateItem = async (req, res) => {
   try {
 
-    const { columns, values } = req.body;
+    const id = req.params.id
+    if (onlyNumbers(req.params.id)) {
 
-    if (!Array.isArray(columns) || !Array.isArray(values) || columns.length !== values.length) {
-        return res.status(400).send({
-            status:"FAILED",
-            data:{
-                error:'Inválido request body'
-            }
-        })
+      const { columns, values } = req.body;
+
+      if (!Array.isArray(columns) || !Array.isArray(values) || columns.length !== values.length) {
+          return res.status(400).send({
+              status:"FAILED",
+              data:{
+                  error:'Request body inválido'
+              }
+          })
+      }
+  
+      const newQuery = columns.map((col,i) => `${col} = $${i+1}`)
+  
+      // const textQuery = "UPDATE persons SET ContactName = $1, City= $2 WHERE CustomerID = $3"
+      const textQuery = `UPDATE persons SET ${newQuery} WHERE id = ${id}`
+      
+      res.json({msj:textQuery})
+      // const varQuery = []
+      // const response = await query(textQuery,varQuery);
+      // res.json({status:"OK", data: response.rows });
+
+    }else{
+      res.status(400).json({
+        status: "FAILED",
+        data: {
+          error: `'${id}': No es un valor válido! Debe de ser solo números y no un string`,
+        },
+      })
     }
-
-    // const textQuery = "UPDATE persons SET ContactName = $1, City= $2 WHERE CustomerID = $3"
-    const textQuery = `${columns}`
-    
-    res.json({msj:textQuery})
-    // const varQuery = []
-    // const response = await query(textQuery,varQuery);
-    // res.json({status:"OK", data: response.rows });
   } catch (error) {
     httpError(res, error);
   }
