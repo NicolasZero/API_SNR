@@ -2,17 +2,17 @@ const {Router} = require('express')
 const router = Router()
 const checkAuth = require('../middleware/checkAuth')
 const checkRoleAuth = require('../middleware/checkRoleAuth')
-const {createItem,deleteItem,getItem,getItems,updateItem,getItemById} = require('../controllers/persons')
+const {createItem,deleteItem,getItem,getItems,updateItem} = require('../controllers/persons')
 
-router.get('/',checkAuth, checkRoleAuth([1,2]),getItems)
+router.get('/',checkAuth, checkRoleAuth([1,2]), getItems)
 
-router.get('/id/:ic',checkAuth, checkRoleAuth([1,2]),getItemById) //id
+router.get('/id/:value',checkAuth, checkRoleAuth([1,2]),getItem('id'))
 
-router.get('ic/:ic',checkAuth, checkRoleAuth([1,2]),getItem) //identity_card
+router.get('/ic/:value',checkAuth, checkRoleAuth([1,2]),getItem('identity_card'))
 
-router.post('/',checkAuth, checkRoleAuth([1,2]),createItem)
+router.put('/',checkAuth, checkRoleAuth([1,2]),createItem)
 
-router.patch('/:id',checkAuth, checkRoleAuth([1,2]),updateItem)
+router.patch('/:id',updateItem)
 
 router.delete('/:id',checkAuth, checkRoleAuth([1,2]),deleteItem)
 

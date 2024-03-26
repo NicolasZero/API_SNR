@@ -8,4 +8,8 @@ const pool = new Pool({
     port: process.env.DB_PORT
 })
 
-module.exports = pool
+const query = (text, params, callback) => {
+    return pool.query(text, params, callback)
+}
+
+module.exports = {pool,query}

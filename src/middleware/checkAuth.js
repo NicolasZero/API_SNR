@@ -9,12 +9,14 @@ const checkAuth = async (req, res, next) => {
       next();
     } else {
       res.status(409);
-      res.send({ error: "Tú, no pasaras" });
+      res.send({status:"FAILED",
+      data:{ error: "Tú, no pasaras" }});
     }
   } catch (error) {
     console.log(error);
     res.status(409);
-    res.send({ error: "Tú, no pasaras" });
+    res.send({status:"FAILED",
+    data:{ error: "Tú, no pasaras" }});
   }
 };
 

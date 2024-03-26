@@ -10,7 +10,7 @@ const removeExtension = (fileName) =>{
 
 fs.readdirSync(pathRouter).filter((file)=>{
     const fileName = removeExtension(file)
-    const skip = ['index'].includes(fileName)
+    const skip = ['index','docs'].includes(fileName)
     if (!skip) {
         router.use(`/${fileName}`,require(`./${fileName}`))
         // console.log('--->',fileName)

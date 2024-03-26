@@ -65,7 +65,9 @@ CREATE TABLE auth.users(
     person_id integer NOT NULL UNIQUE,
     role_id integer NOT NULL,
     department_id integer NOT NULL,
-    is_active boolean NOT NULL DEFAULT true
+    is_active boolean NOT NULL DEFAULT true,
+    created date DEFAULT CURRENT_DATE,
+    updated date DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE auth.roles(
