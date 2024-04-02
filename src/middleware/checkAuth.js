@@ -2,21 +2,30 @@ const { verifyToken } = require("../helpers/helperToken");
 
 const checkAuth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ").pop();
-    const tokenData = await verifyToken(token);
-    // console.log(tokenData);
-    if (tokenData._id) {
-      next();
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.split(" ").pop();
+      const tokenData = await verifyToken(token);
+      if (tokenData._id) {
+        next();
+      } else {
+        res.status(409).send({
+          status: "FAILED",
+          data: { error: "Tú, no pasaras" }
+        });
+      }
     } else {
-      res.status(409);
-      res.send({status:"FAILED",
-      data:{ error: "Tú, no pasaras" }});
+      return res.status(409).send({
+        status: "FAILED",
+        data: { error: "Falta auntentificación" }
+      })
     }
+
   } catch (error) {
     console.log(error);
-    res.status(409);
-    res.send({status:"FAILED",
-    data:{ error: "Tú, no pasaras" }});
+    res.status(409).send({
+      status: "FAILED",
+      data: { error: "Ocurrio un error" }
+    });
   }
 };
 
