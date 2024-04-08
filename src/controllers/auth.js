@@ -14,6 +14,7 @@ const authUser = async (req, res) => {
       const tokenSession = await tokenSign(response.rows[0]);
       if (checkPass) {
         res.json({
+          status:"OK",
           data: response.rows,
           tokenSession,
         });
