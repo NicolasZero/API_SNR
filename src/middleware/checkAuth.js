@@ -8,7 +8,7 @@ const checkAuth = async (req, res, next) => {
       if (tokenData) {
         next();
       } else {
-        res.status(409).send({
+        return res.status(409).send({
           status: "FAILED",
           data: { error: "Tú, no pasaras" }
         });

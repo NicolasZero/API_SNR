@@ -11,12 +11,13 @@ const checkRoleAuth = (roles) => async (req, res, next) =>{
             next()
         }else{
             res.status(409);
-            res.send({ error: "Tú no tienes permisos" });
+            res.json({status: "FAILED", error: "Tú no tienes permisos" });
         }
     } catch (error) {
         console.log(error);
         res.status(409);
-        res.send({ error: "Tú no tienes permisos" });
+        res.json({status: "FAILED", error: "Tú no tienes permisos" });
     }
 }
+
 module.exports = checkRoleAuth

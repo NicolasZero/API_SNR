@@ -1,7 +1,7 @@
 const httpError = require("../helpers/helperError");
 const { encrypt, compare } = require("../helpers/helperEncrypt.js");
 const {query} = require("../../config/postgresql");
-const { tokenSign } = require("../helpers/helperToken.js");
+const { tokenSign,verifyToken } = require("../helpers/helperToken.js");
 
 const authUser = async (req, res) => {
   try {
@@ -29,18 +29,22 @@ const authUser = async (req, res) => {
   }
 };
 
-const registerUser = async (req, res) => {
-  try {
-    const { username, password, rol_id, department_id, person_id } = req.body;
-    const passwordHash = await encrypt(password);
-    const resp = await query(
-      "INSERT INTO auth.users (username, password, person_id, rol_id, department_id) VALUES ($1,$2,$3,$4,$5) RETURNING id",
-      [username, passwordHash, person_id, rol_id, department_id]
-    );
-    res.json({ data: resp.rows });
-  } catch (error) {
-    httpError(res, error);
+const refreshToken = async (req, res) => {
+  const refreshToken = req.headers.refresh
+  const tokenData = await verifyToken(refreshToken)
+  if (tokenData) {
+    const tokenSession = await tokenSign({id:tokenData._id});
+    return res.json({
+      status: "OK",
+      data: "refreshed",
+      tokenSession
+    })
+  } else {
+    return res.status(409).send({
+      status: "FAILED",
+      data: { error: "Tú, no pasaras" }
+    })
   }
-};
+}
 
-module.exports = { authUser, registerUser };
+module.exports = { authUser, refreshToken };
