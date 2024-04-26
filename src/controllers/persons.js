@@ -46,6 +46,10 @@ const createItem = async (req, res) => {
       email,
       phone,
       gender_id,
+      state_id,
+      municipality_id,
+      parish_id,
+      address
     } = req.body;
 
     // Verifica que existan los campos obligatorios
@@ -70,10 +74,20 @@ const createItem = async (req, res) => {
       })
     }
 
-    const varQuery = [identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id,]
-    const textQuery = "INSERT INTO persons (identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *"
-    const resp = await query(textQuery, varQuery);
-    return res.json({ status: "OK", data: resp.rows });
+    let varQuery = [identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id]
+    let textQuery = "INSERT INTO persons (identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *"
+    const resp1 = await query(textQuery, varQuery);
+
+    const person_id = resp1.rows[0].id
+
+    varQuery = [person_id, state_id, municipality_id, parish_id, address]
+    textQuery = 'INSERT INTO location (person_id, state_id, municipality_id, parish_id, address) VALUES ($1,$2,$3,$4,$5) RETURNING *'
+    const resp2 = await query(textQuery, varQuery);
+
+    const data = Object.assign({}, resp1.rows[0], resp2.rows[0])
+
+
+    return res.json({ status: "OK", data: [data] });
 
   } catch (error) {
     httpError(res, error)
@@ -104,8 +118,8 @@ const updateItem = async (req, res) => {
       const textQuery = `UPDATE persons SET ${newQuery} WHERE id = ${id} RETURNING *`
       const varQuery = values
 
-      const resp = await query(textQuery,varQuery);
-      res.json({status:"OK", data: resp.rows });
+      const resp = await query(textQuery, varQuery);
+      res.json({ status: "OK", data: resp.rows });
     } else {
       res.status(400).json({
         status: "FAILED",

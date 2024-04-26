@@ -36,7 +36,11 @@ const createItem = async (req, res) => {
             other_last_names,
             email,
             phone,
-            gender_id
+            gender_id,
+            state_id,
+            municipality_id,
+            parish_id,
+            address
         } = req.body
         const hash = await encrypt(password)
 
@@ -70,7 +74,11 @@ const createItem = async (req, res) => {
             }
 
             const resp = await query('INSERT INTO auth.users (username, password, person_id, role_id, department_id, is_active) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [username, hash, person_id, role_id, department_id, true])
-            return res.json({ status: "OK", data: resp.rows })
+            const resp2 = await query('INSERT INTO location (person_id, state_id, municipality_id, parish_id, address) VALUES ($1,$2,$3,$4,$5) RETURNING *', [person_id, state_id, municipality_id, parish_id, address])
+            
+            const result = Object.assign({}, resp.rows[0], resp2.rows[0])
+
+            return res.json({ status: "OK", data: [result] })
         } else {
             // verifica si ya existe un usuario con ese username o no para evitar errores
             const existUsername = await query('SELECT id FROM auth.users WHERE username = $1', [username])
@@ -86,8 +94,12 @@ const createItem = async (req, res) => {
 
             let resp = await query('INSERT INTO persons (identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id', [identity_card, is_foreign, first_name, other_names, first_last_name, other_last_names, email, phone, gender_id])
             const person_id = resp.rows[0].id
-            resp = await query('INSERT INTO auth.users (username, password, person_id, role_id, department_id, is_active) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id', [username, hash, person_id, role_id, department_id, true])
-            res.json({ status: "OK", data: resp.rows })
+            resp = await query('INSERT INTO auth.users (username, password, person_id, role_id, department_id, is_active) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [username, hash, person_id, role_id, department_id, true])
+            
+            const resp2 = await query('INSERT INTO location (person_id, state_id, municipality_id, parish_id, address) VALUES ($1,$2,$3,$4,$5) RETURNING *', [person_id, state_id, municipality_id, parish_id, address])
+            const data = Object.assign({}, resp.rows[0], resp2.rows[0])
+
+            return res.json({ status: "OK", data: [data] })
         }
     } catch (error) {
         httpError(res, error)
