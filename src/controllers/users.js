@@ -1,6 +1,8 @@
 const httpError = require('../helpers/helperError')
 const { query } = require('../../config/postgresql')
 const { encrypt, compare } = require("../helpers/helperEncrypt.js");
+const { onlyLetters, onlyNumbers } = require("../helpers/helperPattern");
+const {checkColEqVal} = require('../helpers/helperUpdate.js')
 
 const getItems = async (req, res) => {
     try {
@@ -111,26 +113,62 @@ const updateItem = async (req, res) => {
         const id = req.params.id
         // Verifica que la id solo sea numerico
         if (onlyNumbers(req.params.id)) {
-            const { columns, values } = req.body;
-
-            // Verifica que "columns" y "values" son arrays de igual longitud
-            if (!Array.isArray(columns) || !Array.isArray(values) || columns.length !== values.length) {
-                return res.status(400).send({
-                    status: "FAILED",
-                    data: {
-                        error: 'Request body inválido'
-                    }
-                })
+            if ('person' in req.body) {
+                const { columns, values } = req.body.person;
+                if ('status' in checkColEqVal(columns,values)) {
+                    res.status(401).json({status:"TEST",data:{columns,values}})
+                } 
+                console.log("Esto no se debe de ver")
+            }else{
+                res.status(200).json({status:"TEST",data:"No existe person"})
             }
 
-            // extrae los valores de "columns" y "values" para formar la clausula SET del Update
-            const newQuery = columns.map((col, i) => `${col} = $${i + 1}`)
+            if ('user' in req.body) {
+                const { columns, values } = req.body.user;
+                res.status(200).json({status:"TEST",data:{columns,values}})
+            }else{
+                res.status(200).json({status:"TEST",data:"No existe person"})
+            }
 
-            const textQuery = `UPDATE auth.users SET ${newQuery} WHERE id = ${id} RETURNING *`
-            const varQuery = values
+            if ('location' in req.body) {
+                const { columns, values } = req.body.location;
+                res.status(200).json({status:"TEST",data:{columns,values}})
+            }else{
+                res.status(200).json({status:"TEST",data:"No existe person"})
+            }
+            // {
+            //     "person":{
+            //         "columns":["first_name","other_names"],
+            //         "values":["Nicolas", "Jose"]
+            //     },
+            //     "user":{
+            //         "columns":["role"],
+            //         "values":[2]
+            //     },
+            //     "location":{
+            //         "columns":["state"],
+            //         "values":[13]
+            //     }
+            // }
 
-            const resp = await query(textQuery, varQuery);
-            res.json({ status: "OK", data: resp.rows });
+            // // Verifica que "columns" y "values" son arrays de igual longitud
+            // if (!Array.isArray(columns) || !Array.isArray(values) || columns.length !== values.length) {
+            //     return res.status(400).send({
+            //         status: "FAILED",
+            //         data: {
+            //             error: 'Request body inválido'
+            //         }
+            //     })
+            // }
+
+            // // extrae los valores de "columns" y "values" para formar la clausula SET del Update
+            // const newQuery = columns.map((col, i) => `${col} = $${i + 1}`)
+
+            // const textQuery = `UPDATE auth.users SET ${newQuery} WHERE id = ${id} RETURNING *`
+            // const varQuery = values
+
+            // const resp = await query(textQuery, varQuery);
+            // res.json({ status: "OK", data: resp.rows });
         } else {
             res.status(400).json({
                 status: "FAILED",
