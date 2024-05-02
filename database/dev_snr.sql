@@ -1,4 +1,4 @@
--- Ultimpo cambio el 26/03/2024
+-- Ultimpo cambio el 02/05/2024
 -- Crea las tablas
 CREATE TABLE persons(
     --id serial primary key,
@@ -99,16 +99,19 @@ LEFT JOIN auth.roles AS r ON r.id = u.role_id
 LEFT JOIN auth.departments AS d ON d.id = u.department_id;
 
 --Vista para uso público
-CREATE VIEW view_user_profile AS SELECT u.id, u.username, u.is_active, p.identity_card, p.is_foreign, p.first_name, p.other_names, p.first_last_name, p.other_last_names, p.email, p.phone, p.gender_id, g.gender, u.role_id, r.role, u.department_id, d.department FROM auth.users AS u
+CREATE VIEW view_user_profile AS SELECT u.id, u.username, u.is_active, p.identity_card, p.is_foreign, p.first_name, p.other_names, p.first_last_name, p.other_last_names, p.email, p.phone, p.gender_id, g.gender, u.role_id, r.role, u.department_id, d.department, l.state_id, l.state, l.municipality_id, l.municipality, l.parish_id, l.parish, l.address FROM auth.users AS u
 LEFT JOIN persons AS p ON p.id = u.person_id
 LEFT JOIN genders AS g ON g.id = p.gender_id
 LEFT JOIN auth.roles AS r ON r.id = u.role_id
-LEFT JOIN auth.departments AS d ON d.id = u.department_id;
+LEFT JOIN auth.departments AS d ON d.id = u.department_id
+LEFT JOIN view_person_location AS l ON p.id = l.person_id;
 
-CREATE VIEW view_person_location AS SELECT l.state_id, s.state, l.municipality_id, m.municipality, l.parish_id, p.parish, l.address FROM location AS l
+CREATE VIEW view_person_location AS SELECT l.person_id, l.state_id, s.state, l.municipality_id, m.municipality, l.parish_id, p.parish, l.address FROM location AS l
 LEFT JOIN states AS s ON l.state_id = s.id
 LEFT JOIN municipalities AS m ON l.municipality_id = m.id 
 LEFT JOIN parishes AS p ON l.parish_id = p.id;
+
+
 
 --Insertar Datos obligatorios
 INSERT INTO genders (gender) VALUES ('Mujer'),('Hombre'),('Otro');
