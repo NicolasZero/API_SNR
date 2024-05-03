@@ -10,7 +10,7 @@ const checkAuth = async (req, res, next) => {
       } else {
         return res.status(409).send({
           status: "FAILED",
-          data: { error: "Tú, no pasaras" }
+          data: { error: "Ocurrio un error en la comprobacion de los permisos" }
         });
       }
     } else {
