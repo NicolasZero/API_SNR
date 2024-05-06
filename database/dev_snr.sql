@@ -46,7 +46,6 @@ CREATE TABLE general.persons(
     email varchar(200) DEFAULT '',
     phone varchar(20) DEFAULT '',
     phone2 varchar(20) DEFAULT '',
-    birthdate date,
     pregnant boolean NOT NULL DEFAULT false,
     num_children integer NOT NULL DEFAULT 0,
     civil_status_id integer NOT NULL DEFAULT 1,
@@ -70,12 +69,12 @@ CREATE TABLE auth.users(
     id integer NOT NULL UNIQUE GENERATED ALWAYS AS IDENTITY (START WITH 1),
     username varchar(100) NOT NULL UNIQUE,
     password varchar NOT NULL,
+    identity_card integer NOT NULL UNIQUE,
+    is_foreign boolean NOT NULL DEFAULT false,
     names varchar(160) NOT NULL,
     last_names varchar(160) NOT NULL,
     email varchar(200) DEFAULT '',
     phone varchar(20) DEFAULT '',
-    phone2 varchar(20) DEFAULT '',
-    birthdate date,
     gender_id integer NOT NULL DEFAULT 1,
     role_id integer NOT NULL,
     department_id integer NOT NULL,
@@ -164,9 +163,9 @@ LEFT JOIN municipalities AS m ON l.municipality_id = m.id
 LEFT JOIN parishes AS p ON l.parish_id = p.id;
 
 -- general person
-CREATE VIEW view_person_data AS SELECT p.*, r.role, d.department, g.gender, l.state_id, l.state, l.municipality_id, l.municipality, l.parish_id, l.parish, l.address FROM general.person AS p
-LEFT JOIN genders AS g ON g.id = u.gender_id
-LEFT JOIN view_person_location AS l ON u.id = l.user_id;
+CREATE VIEW view_person_data AS SELECT p.*, g.gender, l.state_id, l.state, l.municipality_id, l.municipality, l.parish_id, l.parish, l.address FROM general.persons AS p
+LEFT JOIN genders AS g ON g.id = p.gender_id
+LEFT JOIN view_person_location AS l ON p.id = l.person_id;
 
 
 --Insertar Datos publicos
@@ -186,8 +185,12 @@ INSERT INTO parishes (parish, municipality_id) VALUES ('ALTAGRACIA',1),('CANDELA
 
 
 -- Inserta datos de pruebas
-INSERT INTO auth.users (username,password,names,last_names,email,phone,birthdate,gender_id,role_id,department_id) VALUES ('nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze','Nicolás','Zapata','nicojs2011@gmail.com','04127848101','2000-10-07',2,1,2);
+INSERT INTO auth.users (username,password,identity_card,names,last_names,email,phone,gender_id,role_id,department_id) VALUES ('nicoadmin','$2a$10$iTHAxSj1ooB.J1vCPQEnCel21TUE5qimteBFg6HtL0nDwQ5IWC6Ze',28076011,'Nicolás','Zapata','nicojs2011@gmail.com','04127848101',2,1,2);
 -- password = 123456
 
 INSERT INTO auth.location (user_id,state_id,municipality_id,parish_id,address) VALUES (1,13,177,610,'Calle 8');
+
+INSERT INTO general.persons (identity_card,names,last_names,email,phone,birthdate,gender_id) VALUES (28076011,'Nicolás','Zapata','nicojs2011@gmail.com','04127848101','2000-10-07',2);
+
+INSERT INTO general.location (person_id,state_id,municipality_id,parish_id,address) VALUES (1,13,177,610,'Calle 8');
 --Fin del SQL
