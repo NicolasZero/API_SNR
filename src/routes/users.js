@@ -12,6 +12,17 @@ router.put('/',checkAuth, checkRoleAuth([1,2]),createItem) //const {username,pas
 
 router.patch('/:id',checkAuth, checkRoleAuth([1,2]),updateItem)
 
+// body {
+//     "user":{
+//         "columns":["names","last_names"],
+//         "values":["Nicolás José", "zapata Morillo"]
+//     },
+//     "location":{
+//         "columns":["address"],
+//         "values":["Mikasa 2"]
+//     }
+// }
+
 router.delete('/:id',checkAuth, checkRoleAuth([1,2]),deleteItem)
 
 module.exports = router
