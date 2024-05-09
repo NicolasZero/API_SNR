@@ -125,13 +125,13 @@ const updateItem = async (req, res) => {
             } else {
                 return res.status(409).json({
                     status: "FAILED",
-                    error: { msj: 'Ocurrió un error al actualizar los datos' }
+                    error: { msg: 'Ocurrió un error al actualizar los datos' }
                 })
             }
         } else {
             return res.status(409).json({
                 status: "FAILED",
-                error: { msj: 'Error, identificador no válido' },
+                error: { msg: 'Error, identificador no válido' },
             })
         }
     } catch (error) {

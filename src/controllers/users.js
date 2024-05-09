@@ -75,7 +75,7 @@ const updateItem = async (req, res) => {
     try {
         const id = req.params.id
         // Verifica que la id solo sea numerico
-        if (onlyNumbers(req.params.id)) {
+        if (onlyNumbers(id)) {
             let checkProcess = false
 
             if ('user' in req.body) {
@@ -107,13 +107,13 @@ const updateItem = async (req, res) => {
             } else {
                 return res.status(409).json({
                     status: "FAILED",
-                    error: { msj: 'Ocurrió un error al actualizar los datos' }
+                    error: { msg: 'Ocurrió un error al actualizar los datos' }
                 })
             }
         } else {
             return res.status(409).json({
                 status: "FAILED",
-                error: { msj: 'Error, identificador no válido' },
+                error: { msg: 'Error, identificador no válido' },
             })
         }
     } catch (error) {
@@ -121,13 +121,22 @@ const updateItem = async (req, res) => {
     }
 }
 
-const deleteItem = async (req, res) => {
+const changeStatus = (status) => async (req, res) => {
     try {
-        const response = await query('SELECT * FROM auth.users')
-        res.json({ data: response.rows })
+        const id = req.params.id
+        if (onlyNumbers(id)) {
+            const resp = await query('UPDATE auth.users SET is_active = $1 WHERE id = $2',[status,id])
+            const msg = status == true ?  "Usuario activado" : "Usuario eliminado"
+            res.json({ status: "OK", data: {msg: msg}})
+        }else{
+            return res.status(409).json({
+                status: "FAILED",
+                error: { msg: 'Error, identificador no válido' },
+            })
+        }
     } catch (error) {
         httpError(res, error)
     }
 }
 
-module.exports = { getItem, getItems, createItem, updateItem, deleteItem }
+module.exports = { getItem, getItems, createItem, updateItem, changeStatus }
