@@ -98,48 +98,26 @@ const updateItem = async (req, res) => {
 
             if ('person' in req.body) {
                 const { columns, values } = req.body.person;
-
-                // verifica que los nombres de las columnas sean posibles nombres permitidos
-                const verifiedColumn = columns.filter(col => onlyDbNamePattern(col))
-
-                // Verifica que "columns" y "values" son arrays de igual longitud
-                if (!Array.isArray(verifiedColumn) || !Array.isArray(values) || verifiedColumn.length !== values.length || verifiedColumn.length !== columns.length) {
-                    return res.status(409).json({
-                        status: "FAILED",
-                        error: { msj: 'Ocurrió un error al actualizar los datos' }
-                    })
+                if (checkColEqVal(res, columns, values)) {
+                    const newQuery = setColAndVal(columns)
+                    const textQuery = `UPDATE general.persons SET ${newQuery} WHERE id = ${id}`
+                    const resp = await query(textQuery, values);
+                    checkProcess = true
+                }else{
+                    return 0
                 }
-
-                // extrae los valores de "columns" y "values" para formar la clausula SET del Update
-                const newQuery = columns.map((col, i) => `${col} = $${i + 1}`)
-
-                const textQuery = `UPDATE general.persons SET ${newQuery} WHERE id = ${id}`
-                const varQuery = values
-                const resp = await query(textQuery, varQuery);
-                checkProcess = true
             }
 
             if ('location' in req.body) {
                 const { columns, values } = req.body.location;
-
-                // verifica que los nombres de las columnas sean posibles nombres permitidos
-                const verifiedColumn = columns.filter(col => onlyDbNamePattern(col))
-
-                // Verifica que "columns" y "values" son arrays de igual longitud
-                if (!Array.isArray(verifiedColumn) || !Array.isArray(values) || verifiedColumn.length !== values.length || verifiedColumn.length !== columns.length) {
-                    return res.status(409).json({
-                        status: "FAILED",
-                        error: { msj: 'Ocurrió un error al actualizar los datos' }
-                    })
+                if (checkColEqVal(res, columns, values)) {
+                    const newQuery = setColAndVal(columns)
+                    const textQuery = `UPDATE general.location SET ${newQuery} WHERE person_id = ${id}`
+                    const resp = await query(textQuery, values);
+                    checkProcess = true
+                }else{
+                    return 0
                 }
-
-                // extrae los valores de "columns" y "values" para formar la clausula SET del Update
-                const newQuery = columns.map((col, i) => `${col} = $${i + 1}`)
-
-                const textQuery = `UPDATE general.location SET ${newQuery} WHERE person_id = ${id}`
-                const varQuery = values
-                const resp = await query(textQuery, varQuery);
-                checkProcess = true
             }
 
             if (checkProcess) {

@@ -1,8 +1,5 @@
 const { onlyLetters, onlyNumbers, onlyDbNamePattern } = require("./helperPattern");
 
-
-
-
 // Verifica que la estructura de "columns" y "values" sean correcta
 const checkColEqVal = (res, columns, values) => {
     // verifica que los nombres de las columnas sean posibles nombres permitidos

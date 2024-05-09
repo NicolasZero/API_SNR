@@ -1,4 +1,4 @@
--- Ultimpo cambio el 03/05/2024
+-- Ultimpo cambio el 09/05/2024
 -- Crea un esquema
 CREATE SCHEMA auth;
 CREATE SCHEMA general;
@@ -46,6 +46,7 @@ CREATE TABLE general.persons(
     email varchar(200) DEFAULT '',
     phone varchar(20) DEFAULT '',
     phone2 varchar(20) DEFAULT '',
+    birthdate date,
     pregnant boolean NOT NULL DEFAULT false,
     num_children integer NOT NULL DEFAULT 0,
     civil_status_id integer NOT NULL DEFAULT 1,
