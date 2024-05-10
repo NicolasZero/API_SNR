@@ -1,8 +1,15 @@
 const httpError = require('../helpers/helperError')
-const { query } = require('../../config/postgresql')
+const { query, pool } = require('../../config/postgresql')
 const { encrypt, compare } = require("../helpers/helperEncrypt.js");
-const { onlyLetters, onlyNumbers } = require("../helpers/helperPattern");
-const { checkColEqVal, setColAndVal } = require('../helpers/helperUpdate.js')
+const { onlyNumbers } = require("../helpers/helperPattern");
+// const { Pool } = require('pg')
+// const pool = new Pool({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_NAME,
+//     port: process.env.DB_PORT
+// })
 
 const getItems = async (req, res) => {
     try {
@@ -72,53 +79,70 @@ const createItem = async (req, res) => {
 }
 
 const updateItem = async (req, res) => {
+    const client = await pool.connect()
+
     try {
         const id = req.params.id
         // Verifica que la id solo sea numerico
         if (onlyNumbers(id)) {
-            let checkProcess = false
+            const { 
+                address,
+                department_id,
+                email,
+                gender_id,
+                identity_card,
+                is_foreign,
+                last_names,
+                municipality_id,
+                names,
+                parish_id,
+                phone,
+                resetPassword,
+                role_id,
+                state_id
+            } = req.body;
 
-            if ('user' in req.body) {
-                const { columns, values } = req.body.user;
-                if (checkColEqVal(res, columns, values)) {
-                    const newQuery = setColAndVal(columns)
-                    const textQuery = `UPDATE auth.users SET ${newQuery} WHERE id = ${id}`
-                    const resp = await query(textQuery, values);
-                    checkProcess = true
-                }else{
-                    return 0
-                }
-            }
+            if (resetPassword == false) {
+                await client.query("BEGIN")
+                let textQuery = "UPDATE auth.users SET department_id = $1,email = $2,gender_id = $3,identity_card = $4,is_foreign = $5,last_names = $6,names = $7,phone = $8,role_id = $9 WHERE id = $10"
+                let values = [department_id,email,gender_id,identity_card,is_foreign,last_names,names,phone,role_id,id]
+                const resp = await client.query(textQuery, values)
+                // console.log(resp.rowCount)
 
-            if ('location' in req.body) {
-                const { columns, values } = req.body.location;
-                if (checkColEqVal(res, columns, values)) {
-                    const newQuery = setColAndVal(columns)
-                    const textQuery = `UPDATE auth.location SET ${newQuery} WHERE user_id = ${id}`
-                    const resp = await query(textQuery, values);
-                    checkProcess = true
-                }else{
-                    return 0
-                }
-            }
+                textQuery = "UPDATE auth.location SET address = $1, municipality_id = $2, parish_id = $3, state_id = $4 WHERE id = $5"
+                values = [address,municipality_id,parish_id,state_id,id]
+                const resp2 = await client.query(textQuery, values)
+                await client.query("COMMIT")
+                // console.log(resp2)
+                
+                res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
+                // if (resp.rowCount) {
+                // }else{
+                //     res.status(409).json({
+                //         status: "FAILED",
+                //         error: { msg: 'Error, identificador no válido' },
+                //     })
+                // }
 
-            if (checkProcess) {
-                return res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" } });
-            } else {
-                return res.status(409).json({
-                    status: "FAILED",
-                    error: { msg: 'Ocurrió un error al actualizar los datos' }
-                })
+            }else if (resetPassword == true) {
+                // const textQuery = "UPDATE auth.users SET address = $1,department_id = $2,email = $3,gender_id = $4,identity_card = $5,is_foreign = $6,last_names = $7,municipality_id = $8,names = $9,parish_id = $10,phone = $11,role_id = $12,state_id = $13,password = $14 WHERE id = $15"
+                // const values = [address,department_id,email,gender_id,identity_card,is_foreign,last_names,municipality_id,names,parish_id,phone,role_id,state_id,identity_card,id]
+                // const resp = await query(textQuery, values);
+                // res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
             }
         } else {
-            return res.status(409).json({
+            res.status(409).json({
                 status: "FAILED",
                 error: { msg: 'Error, identificador no válido' },
             })
         }
     } catch (error) {
+        await client.query("ROLLBACK")
         httpError(res, error)
+    } finally {
+        client.release()
     }
+
 }
 
 const changeStatus = (status) => async (req, res) => {

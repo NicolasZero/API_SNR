@@ -1,6 +1,6 @@
 const httpError = require("../helpers/helperError");
 const { query } = require("../../config/postgresql");
-const { onlyLetters, onlyNumbers, onlyDbNamePattern } = require("../helpers/helperPattern");
+const { onlyLetters, onlyNumbers } = require("../helpers/helperPattern");
 
 // Consulta todos
 const getItems = async (req, res) => {
@@ -93,41 +93,10 @@ const updateItem = async (req, res) => {
         const id = req.params.id
         // Verifica que la id solo sea numerico
         if (onlyNumbers(req.params.id)) {
-            // const { columns, values } = req.body;
-            let checkProcess = false
-
-            if ('person' in req.body) {
-                const { columns, values } = req.body.person;
-                if (checkColEqVal(res, columns, values)) {
-                    const newQuery = setColAndVal(columns)
-                    const textQuery = `UPDATE general.persons SET ${newQuery} WHERE id = ${id}`
-                    const resp = await query(textQuery, values);
-                    checkProcess = true
-                }else{
-                    return 0
-                }
-            }
-
-            if ('location' in req.body) {
-                const { columns, values } = req.body.location;
-                if (checkColEqVal(res, columns, values)) {
-                    const newQuery = setColAndVal(columns)
-                    const textQuery = `UPDATE general.location SET ${newQuery} WHERE person_id = ${id}`
-                    const resp = await query(textQuery, values);
-                    checkProcess = true
-                }else{
-                    return 0
-                }
-            }
-
-            if (checkProcess) {
-                return res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" } });
-            } else {
-                return res.status(409).json({
-                    status: "FAILED",
-                    error: { msg: 'Ocurrió un error al actualizar los datos' }
-                })
-            }
+            return res.status(200).json({
+                status: "OK",
+                data: { msg: 'En produccion' },
+            })
         } else {
             return res.status(409).json({
                 status: "FAILED",
@@ -142,8 +111,10 @@ const updateItem = async (req, res) => {
 // elimina
 const deleteItem = async (req, res) => {
     try {
-        const response = await query("SELECT * FROM persons");
-        res.json({ data: response.rows });
+        return res.status(200).json({
+            status: "OK",
+            data: { msg: 'En produccion' },
+        })
     } catch (error) {
         httpError(res, error);
     }
