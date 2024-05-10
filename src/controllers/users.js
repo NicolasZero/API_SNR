@@ -125,10 +125,19 @@ const updateItem = async (req, res) => {
                 // }
 
             }else if (resetPassword == true) {
-                // const textQuery = "UPDATE auth.users SET address = $1,department_id = $2,email = $3,gender_id = $4,identity_card = $5,is_foreign = $6,last_names = $7,municipality_id = $8,names = $9,parish_id = $10,phone = $11,role_id = $12,state_id = $13,password = $14 WHERE id = $15"
-                // const values = [address,department_id,email,gender_id,identity_card,is_foreign,last_names,municipality_id,names,parish_id,phone,role_id,state_id,identity_card,id]
-                // const resp = await query(textQuery, values);
-                // res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
+                const hash = await encrypt(identity_card.toString())
+                await client.query("BEGIN")
+                let textQuery = "UPDATE auth.users SET department_id = $1,email = $2,gender_id = $3,identity_card = $4,is_foreign = $5,last_names = $6,names = $7,phone = $8,role_id = $9, password = $10 WHERE id = $11"
+                let values = [department_id,email,gender_id,identity_card,is_foreign,last_names,names,phone,role_id,hash,id]
+                const resp = await client.query(textQuery, values)
+                // console.log(resp.rowCount)
+
+                textQuery = "UPDATE auth.location SET address = $1, municipality_id = $2, parish_id = $3, state_id = $4 WHERE id = $5"
+                values = [address,municipality_id,parish_id,state_id,id]
+                const resp2 = await client.query(textQuery, values)
+                await client.query("COMMIT")
+                // console.log(resp2)
+                res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
             }
         } else {
             res.status(409).json({
