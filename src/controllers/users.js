@@ -85,7 +85,7 @@ const updateItem = async (req, res) => {
         const id = req.params.id
         // Verifica que la id solo sea numerico
         if (onlyNumbers(id)) {
-            const { 
+            const {
                 address,
                 department_id,
                 email,
@@ -102,43 +102,32 @@ const updateItem = async (req, res) => {
                 state_id
             } = req.body;
 
-            if (resetPassword == false) {
-                await client.query("BEGIN")
-                let textQuery = "UPDATE auth.users SET department_id = $1,email = $2,gender_id = $3,identity_card = $4,is_foreign = $5,last_names = $6,names = $7,phone = $8,role_id = $9 WHERE id = $10"
-                let values = [department_id,email,gender_id,identity_card,is_foreign,last_names,names,phone,role_id,id]
-                const resp = await client.query(textQuery, values)
-                // console.log(resp.rowCount)
+            // Inicia la transacción
+            await client.query("BEGIN")
 
-                textQuery = "UPDATE auth.location SET address = $1, municipality_id = $2, parish_id = $3, state_id = $4 WHERE id = $5"
-                values = [address,municipality_id,parish_id,state_id,id]
-                const resp2 = await client.query(textQuery, values)
-                await client.query("COMMIT")
-                // console.log(resp2)
-                
-                res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
-                // if (resp.rowCount) {
-                // }else{
-                //     res.status(409).json({
-                //         status: "FAILED",
-                //         error: { msg: 'Error, identificador no válido' },
-                //     })
-                // }
+            // Actualiza los datos básicos del usuario
+            let textQuery = "UPDATE auth.users SET department_id = $1,email = $2,gender_id = $3,identity_card = $4,is_foreign = $5,last_names = $6,names = $7,phone = $8,role_id = $9 WHERE id = $10"
+            let values = [department_id, email, gender_id, identity_card, is_foreign, last_names, names, phone, role_id, id]
+            const resp = await client.query(textQuery, values)
 
-            }else if (resetPassword == true) {
+            // Actualiza los datos de localización del usuario
+            textQuery = "UPDATE auth.location SET address = $1, municipality_id = $2, parish_id = $3, state_id = $4 WHERE id = $5"
+            values = [address, municipality_id, parish_id, state_id, id]
+            const resp2 = await client.query(textQuery, values)
+
+            // Si quiere resetear la contraseña
+            if (resetPassword == true) {
+                // cambia la contraseña por su cédula actual
                 const hash = await encrypt(identity_card.toString())
-                await client.query("BEGIN")
-                let textQuery = "UPDATE auth.users SET department_id = $1,email = $2,gender_id = $3,identity_card = $4,is_foreign = $5,last_names = $6,names = $7,phone = $8,role_id = $9, password = $10 WHERE id = $11"
-                let values = [department_id,email,gender_id,identity_card,is_foreign,last_names,names,phone,role_id,hash,id]
-                const resp = await client.query(textQuery, values)
-                // console.log(resp.rowCount)
-
-                textQuery = "UPDATE auth.location SET address = $1, municipality_id = $2, parish_id = $3, state_id = $4 WHERE id = $5"
-                values = [address,municipality_id,parish_id,state_id,id]
+                textQuery = "UPDATE auth.users SET password = $1 WHERE id = $2"
+                values = [hash, id]
                 const resp2 = await client.query(textQuery, values)
-                await client.query("COMMIT")
-                // console.log(resp2)
-                res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" }})
             }
+            // Termina la transacción
+            await client.query("COMMIT")
+
+            res.json({ status: "OK", data: { msg: "Los datos se actualizaron correctamente" } })
+
         } else {
             res.status(409).json({
                 status: "FAILED",
@@ -158,10 +147,10 @@ const changeStatus = (status) => async (req, res) => {
     try {
         const id = req.params.id
         if (onlyNumbers(id)) {
-            const resp = await query('UPDATE auth.users SET is_active = $1 WHERE id = $2',[status,id])
-            const msg = status == true ?  "Usuario activado" : "Usuario eliminado"
-            res.json({ status: "OK", data: {msg: msg}})
-        }else{
+            const resp = await query('UPDATE auth.users SET is_active = $1 WHERE id = $2', [status, id])
+            const msg = status == true ? "Usuario activado" : "Usuario eliminado"
+            res.json({ status: "OK", data: { msg: msg } })
+        } else {
             return res.status(409).json({
                 status: "FAILED",
                 error: { msg: 'Error, identificador no válido' },
